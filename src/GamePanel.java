@@ -56,6 +56,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	void updateIntroState() {
+		//for tester
 	}
 
 	void updateEndState() {
