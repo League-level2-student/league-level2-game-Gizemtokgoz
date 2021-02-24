@@ -5,6 +5,7 @@ public class Platform extends GameObject{
 	String plat1;
 	String plat2;
 	String plat3;
+	String plat4;
 
 	Platform(int x, int y, int width, int height) {
 		super(x, y, width, height);

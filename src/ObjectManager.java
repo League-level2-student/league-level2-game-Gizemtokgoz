@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +12,7 @@ public class ObjectManager implements ActionListener {
 	ArrayList<Platform> platform;
 	Random rand = new Random();
 	int score = 0;
+	Font titleFont;
 
 	int getScore() {
 		return score;
@@ -20,9 +23,10 @@ public class ObjectManager implements ActionListener {
 		candy = new ArrayList<Candy>();
 		platform = new ArrayList<Platform>();
 
-		platform.add(new Platform(0, 600, 500, 20));
-		platform.add(new Platform(400, 450, 500, 20));
-		platform.add(new Platform(0, 300, 500, 20));
+		platform.add(new Platform(0, 525, 500, 20));
+		platform.add(new Platform(400, 400, 500, 20));
+		platform.add(new Platform(0, 250, 500, 20));
+		platform.add(new Platform(400, 100, 500, 20));
 	}
 
 	void addCandy(int numCandy) {
@@ -41,13 +45,6 @@ public class ObjectManager implements ActionListener {
 		checkCollision();
 		purgeObjects();
 
-		if (wonka.isActive) {
-			purgeObjects();
-		}
-
-		else {
-
-		}
 	}
 
 	void draw(Graphics g) {
@@ -58,6 +55,16 @@ public class ObjectManager implements ActionListener {
 		
 		for (int i = 0; i < platform.size(); i++) {
 			platform.get(i).draw(g);
+		}
+		
+		if (candy.size()==0) {
+			titleFont = new Font("Calibri", Font.PLAIN, 58);
+			g.setFont(titleFont);
+			g.setColor(Color.RED);
+			g.drawString("YOU WON!", 350, 300);
+		}
+		else {
+
 		}
 	}
 
@@ -72,7 +79,8 @@ public class ObjectManager implements ActionListener {
 	void checkCollision() {
 		for (int i = 0; i < candy.size(); i++) {
 			if (wonka.collisionBox.intersects(candy.get(i).collisionBox)) {
-				wonka.isActive = false;
+				//wonka.isActive = false;
+				candy.get(i).isActive = false;
 			}
 		}
 	}

@@ -4,7 +4,7 @@ import javax.swing.JFrame;
 
 public class WonkaWorld {
 	static final int WIDTH = 900;
-	static final int HEIGHT = 800;
+	static final int HEIGHT = 700;
 	JFrame frame;
 	GamePanel panel;
 

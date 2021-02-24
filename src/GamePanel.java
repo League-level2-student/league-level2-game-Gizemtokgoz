@@ -23,6 +23,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	Timer candySpawn;
 	Timer frameDraw;
 	WillyWonka wonka = new WillyWonka(250, 700, 50, 50);
+	Timer fps;
+	int frameCount = 0;
+	int startFrameCount = 0;
 	ObjectManager manager = new ObjectManager(wonka);
 	public static BufferedImage bgimage;
 	public static BufferedImage menuimage;
@@ -33,6 +36,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	GamePanel() {
 		frameDraw = new Timer(1000 / 100, this);
 		frameDraw.start();
+		wonka = new WillyWonka(WonkaWorld.WIDTH / 2, 400, 378 / 3, 720 / 3);
+		fps = new Timer(1000 / 60, this);
+		fps.start();
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		this.setPreferredSize(new Dimension(WonkaWorld.WIDTH, WonkaWorld.HEIGHT));
 
@@ -56,7 +62,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	void updateIntroState() {
-		//for tester
+		// for tester
 	}
 
 	void updateEndState() {
@@ -66,20 +72,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		g.setColor(Color.PINK);
 		g.fillRect(0, 0, WonkaWorld.WIDTH, WonkaWorld.HEIGHT);
 
-		titleFont = new Font("Arial", Font.PLAIN, 58);
+		titleFont = new Font("Calibri", Font.PLAIN, 58);
 		g.setFont(titleFont);
 		g.setColor(Color.WHITE);
-		g.drawString("WONKA WORLD", 200, 150);
-		titleFont = new Font("Arial", Font.PLAIN, 30);
+		g.drawString("WONKA WORLD", 220, 150);
+		titleFont = new Font("Calibri", Font.PLAIN, 30);
 		g.setFont(titleFont);
 		g.setColor(Color.WHITE);
-		g.drawString("welcome to wonka world!", 260, 200);
-		titleFont = new Font("Arial", Font.PLAIN, 25);
+		g.drawString("welcome to wonka world!", 280, 200);
+		titleFont = new Font("Calibri", Font.PLAIN, 25);
 		g.setFont(titleFont);
-		g.drawString("press ENTER to start", 300, 400);
-		titleFont = new Font("Arial", Font.PLAIN, 25);
+		g.drawString("press ENTER to start", 320, 400);
+		titleFont = new Font("Calibri", Font.PLAIN, 25);
 		g.setFont(titleFont);
-		g.drawString("press SPACE for instructions", 267, 600);
+		g.drawString("press SPACE for instructions", 287, 600);
 	}
 
 	void drawMap(Graphics g) {
@@ -92,7 +98,14 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	void drawIntro(Graphics g) {
 		g.setColor(Color.ORANGE);
 		g.fillRect(0, 0, WonkaWorld.WIDTH, WonkaWorld.HEIGHT);
-		manager.draw(g);
+		titleFont = new Font("Arial", Font.PLAIN, 20);
+		g.setFont(titleFont);
+		g.setColor(Color.WHITE);
+		g.drawString("Uh Oh! Willy Wonka spilled all of his candy!", 270, 150);
+		g.drawString(" Help him clean the mess up by", 310, 180);
+		g.drawString("getting to the bag at the top platform.", 300, 210);
+		g.drawString(" To jump press the up arrow. And to move side", 270, 240);
+		g.drawString("to side use the left and right arrows.", 310, 270);
 	}
 
 	void drawGameover(Graphics g) {
@@ -102,7 +115,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		titleFont = new Font("Arial", Font.PLAIN, 30);
 		g.setFont(titleFont);
 		g.setColor(Color.WHITE);
-		g.drawString("oh no you lost but you can press ENTER to play again", 70, 350);
+		g.drawString("press ENTER to play again", 300, 350);
 	}
 
 	public void paintComponent(Graphics g) {
@@ -115,10 +128,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		} else if (currentState == GAMEOVER) {
 			drawGameover(g);
 		}
+
+		// wonka.update(frameCount);
+		wonka.draw(g);
 	}
 
 	void startGame() {
-		manager.addCandy(10);
+		manager.addCandy(30);
 	}
 
 	public void actionPerformed(ActionEvent arg0) {
@@ -133,34 +149,35 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 			updateEndState();
 		}
 
+		frameCount++;
 		repaint();
 	}
 
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (currentState == GAMEOVER) {
-				currentState = MENU;
-				wonka = new WillyWonka(250, 700, 50, 50);
-				manager = new ObjectManager(wonka);
-			}
-		}
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			if (currentState == MENU) {
 				currentState = INTRO;
-				wonka = new WillyWonka(250, 700, 50, 50);
-				manager = new ObjectManager(wonka);
+			} else if (currentState == INTRO) {
+				currentState = MENU;
 			}
-
-			else if (currentState == MENU) {
+		}
+		
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if (currentState == MENU) {
 				currentState = MAP;
+				wonka = new WillyWonka(250, 700, 50, 70);
+				manager = new ObjectManager(wonka);
 				startGame();
 			} else if (currentState == MAP) {
 				currentState = GAMEOVER;
+			} else if (currentState == GAMEOVER) {
+				currentState = MENU;
 			} else {
 				currentState++;
 			}
 			System.out.println(currentState);
+
 		} else if (e.getKeyCode() == KeyEvent.VK_UP)
 
 		{
@@ -178,10 +195,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	}
 
 	@Override
-	public void keyReleased(KeyEvent arg0) {
+	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		wonka.speedx = 0;
-		wonka.speedy = 0;
+		int keyPressed = e.getKeyCode();
+
+		if (keyPressed == KeyEvent.VK_LEFT || (keyPressed == KeyEvent.VK_RIGHT)) {
+			wonka.speedx = 0;
+		}
 	}
 
 	@Override

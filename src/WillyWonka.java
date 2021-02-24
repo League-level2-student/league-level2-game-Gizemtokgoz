@@ -10,38 +10,57 @@ public class WillyWonka extends GameObject {
 	public static boolean needImage = true;
 	public static boolean gotImage = false;
 	boolean inair = false;
-	int gravity = 2;
-	int startingGravity = 2;
-	int wonkaYVelocity;
+	public static final int JUMP_VELOCITY = 30;
+	int x;
+	int y;
+	int yold;
+	int width;
+	int height;
+	int gravityIncrement = 1;
+	int startGravity = 3;
+	int gravity = startGravity;
+	int jumpDecayVelocity = 0;
+	int currentFrame = 0;
+	int startJumpFrame = 0;
+	boolean jumping = false;
+	BufferedImage wonkaStandImage;
+	BufferedImage wonkaJump1Image;
+	BufferedImage wonkaJump2Image;
 
 	WillyWonka(int x, int y, int width, int height) {
 		super(x, y, width, height);
-		speed = 20;
-		if (needImage) {
-			loadImage("Willy-Wonka.png");
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+
+		try {
+			wonkaStandImage = ImageIO.read(this.getClass().getResourceAsStream("wonka_stand.png"));
+			wonkaJump1Image = ImageIO.read(this.getClass().getResourceAsStream("wonka_jump1.png"));
+			wonkaJump2Image = ImageIO.read(this.getClass().getResourceAsStream("wonka_jump2.png"));
+		} catch (Exception e) {
+			System.out.println("ERROR: Unable to load images!");
 		}
 	}
 
-	void loadImage(String imageFile) {
-		if (needImage) {
-			try {
-				image = ImageIO.read(this.getClass().getResourceAsStream(imageFile));
-				gotImage = true;
-			} catch (Exception e) {
-
-			}
-			needImage = false;
+	public void jump() {
+		if (!jumping) {
+			speedy = WillyWonka.JUMP_VELOCITY;
+			gravity = startGravity;
+			startJumpFrame = this.currentFrame;
+			jumping = true;
 		}
 	}
 
 	void draw(Graphics g) {
-		if (gotImage) {
-			g.setColor(Color.green);
-			g.fillRect(x, y, width, height);
-			g.drawImage(image, x, y, width, height, null);
+		if (jumping) {
+			if (speedy > JUMP_VELOCITY / 2) {
+				g.drawImage(wonkaJump1Image, x, y, width, height, null);
+			} else {
+				g.drawImage(wonkaJump2Image, x, y, width, height, null);
+			}
 		} else {
-			g.setColor(Color.green);
-			g.fillRect(x, y, width, height);
+			g.drawImage(wonkaStandImage, x, y, width, height, null);
 		}
 	}
 
@@ -54,13 +73,11 @@ public class WillyWonka extends GameObject {
 	}
 
 	public void up() {
-		if (!inair) {
-			speedy = -6;
-		}
+		jump();
 	}
 
 	public void down() {
-		speedy = 6;
+		//speedy = 6;
 	}
 
 	public void gravity() {
@@ -68,40 +85,88 @@ public class WillyWonka extends GameObject {
 	}
 
 	void update(ArrayList<Platform> platform) {
-		inair = true;
-		
-		if (y + height + gravity < 800) {
-			y += gravity;
-
-			/*
-			 * for (int i = 0; i < platform.size(); i++) { if
-			 * (this.collisionBox.intersects(platform.get(i).collisionBox)) { y -= gravity;
-			 * break; } }
-			 */
+		this.currentFrame = currentFrame;
+		x += speedx;
+		if (x > WonkaWorld.WIDTH - width) {
+			x = WonkaWorld.WIDTH - width;
+		}
+		if (x < 0) {
+			x = 0;
 		}
 
-		x += speedx;
-		y += speedy;
+		if (jumping) {
+			gravity += gravityIncrement;
 
-		for (int i = 0; i < platform.size(); i++) {
-			if (this.collisionBox.intersects(platform.get(i).collisionBox)) {
-				if (platform.get(i).y > this.y) {
-					y -= gravity;
-				} else if (platform.get(i).y < this.y) {
-					y -= speedy;
+			if ((currentFrame - startJumpFrame) % 10 == 0) {
+				speedy -= jumpDecayVelocity;
+				// System.out.println("speedy adjusted=" + speedy);
+			}
+		}
+
+		yold = y;
+		y += gravity - speedy;
+
+		// System.out.println("y=" + y + "yold=" + yold);
+
+		// For falling off platform
+		if (!jumping) {
+			gravity = startGravity;
+			speedy = 0;
+		}
+
+		// Going up
+		if (y < yold) {
+			for (int i = 0; i < platform.size(); i++) {
+				for (int j = yold; j >= y; j = j - 1) {
+					// System.out.println(j);
+					this.collisionBox.setBounds(x, j, width, height);
+					if (this.collisionBox.intersects(platform.get(i).collisionBox)) {
+						// Hits head at platform, falling back
+						// System.out.println("Hit head, j=" + j);
+						y = platform.get(i).y + platform.get(i).height;
+						gravity = startGravity;
+						speedy = 0;
+						break;
+					}
 				}
 			}
-			System.out.println(y + height);
-			System.out.println(platform.get(i).y);
-			if (y+height == platform.get(i).y+2) {
-				inair = false;
+		}
+		// Going down
+		else {
+			for (int i = 0; i < platform.size(); i++) {
+				for (int j = yold; j <= y; j = j + 1) {
+					this.collisionBox.setBounds(x, j, width, height);
+					if (this.collisionBox.intersects(platform.get(i).collisionBox)) {
+						// Landed on platform. Stop jump
+						// System.out.println("Landed on platform, j=" + j);
+						y = platform.get(i).y - height;
+						jumping = false;
+						// gravity = 0;
+						speedy = 0;
+						break;
+					}
+				}
 			}
 		}
-		if (y+height == 798) {
-			inair = false;
+
+		// Stop at top
+		if (y <= 0) {
+			y = 0;
+			gravity = startGravity;
+			speedy = 0;
 		}
 
-		
-		super.update();
+		// Stop at bottom
+		if (y > WonkaWorld.HEIGHT - height) {
+			y = WonkaWorld.HEIGHT - height;
+			jumping = false;
+			//gravity = 0;
+			speedy = 0;
+		}
+
+		// super.update();
+		// System.out.println("Wonka");
+		this.collisionBox.setBounds(x, y, width, height);
+
 	}
 }
