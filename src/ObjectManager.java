@@ -13,6 +13,8 @@ public class ObjectManager implements ActionListener {
 	Random rand = new Random();
 	int score = 0;
 	Font titleFont;
+	Stopwatch sw;
+	boolean playing = true;
 
 	int getScore() {
 		return score;
@@ -27,6 +29,9 @@ public class ObjectManager implements ActionListener {
 		platform.add(new Platform(400, 400, 500, 20));
 		platform.add(new Platform(0, 250, 500, 20));
 		platform.add(new Platform(400, 100, 500, 20));
+
+		sw = new Stopwatch();
+		sw.Init(15);
 	}
 
 	void addCandy(int numCandy) {
@@ -36,6 +41,10 @@ public class ObjectManager implements ActionListener {
 	}
 
 	void update() {
+		if (playing == false) {
+			return;
+		}
+		
 		for (int i = 0; i < candy.size(); i++) {
 			candy.get(i).update();
 		}
@@ -52,18 +61,34 @@ public class ObjectManager implements ActionListener {
 		for (int i = 0; i < candy.size(); i++) {
 			candy.get(i).draw(g);
 		}
-		
+
 		for (int i = 0; i < platform.size(); i++) {
 			platform.get(i).draw(g);
 		}
-		
-		if (candy.size()==0) {
+
+		titleFont = new Font("Calibri", Font.PLAIN, 50);
+		g.setFont(titleFont);
+		g.setColor(Color.RED);
+		g.drawString(String.valueOf(sw.countdown), 425, 40);
+
+		if (candy.size() == 0) {
 			titleFont = new Font("Calibri", Font.PLAIN, 58);
 			g.setFont(titleFont);
 			g.setColor(Color.RED);
 			g.drawString("YOU WON!", 350, 300);
+			sw.Stop();
+			playing = false;
 		}
-		else {
+
+		if (sw.countdown == 0) {
+			titleFont = new Font("Calibri", Font.PLAIN, 58);
+			g.setFont(titleFont);
+			g.setColor(Color.RED);
+			g.drawString("YOU LOST", 350, 300);
+			sw.Stop();
+			playing = false;
+
+		} else {
 
 		}
 	}
@@ -79,7 +104,7 @@ public class ObjectManager implements ActionListener {
 	void checkCollision() {
 		for (int i = 0; i < candy.size(); i++) {
 			if (wonka.collisionBox.intersects(candy.get(i).collisionBox)) {
-				//wonka.isActive = false;
+				// wonka.isActive = false;
 				candy.get(i).isActive = false;
 			}
 		}
@@ -88,6 +113,6 @@ public class ObjectManager implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		// TODO Auto-generated method stub
-		//addCandy();
+		// addCandy();
 	}
 }

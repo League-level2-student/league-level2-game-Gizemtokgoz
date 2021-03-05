@@ -26,7 +26,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	Timer fps;
 	int frameCount = 0;
 	int startFrameCount = 0;
-	ObjectManager manager = new ObjectManager(wonka);
+	
+	ObjectManager manager;
 	public static BufferedImage bgimage;
 	public static BufferedImage menuimage;
 	public static BufferedImage endimage;
@@ -92,6 +93,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		g.setColor(Color.PINK);
 		g.fillRect(0, 0, WonkaWorld.WIDTH, WonkaWorld.HEIGHT);
 		g.drawImage(bgimage, 0, 0, WonkaWorld.WIDTH, WonkaWorld.HEIGHT, null);
+		g.setColor(Color.GREEN);
+		g.fillRect(400, 0, 100, 50);
 		manager.draw(g);
 	}
 
@@ -103,9 +106,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		g.setColor(Color.WHITE);
 		g.drawString("Uh Oh! Willy Wonka spilled all of his candy!", 270, 150);
 		g.drawString(" Help him clean the mess up by", 310, 180);
-		g.drawString("getting to the bag at the top platform.", 300, 210);
-		g.drawString(" To jump press the up arrow. And to move side", 270, 240);
-		g.drawString("to side use the left and right arrows.", 310, 270);
+		g.drawString(" collecting all of the candy.", 320, 210);
+		g.drawString(" To jump press the up arrow. And to move side", 260, 240);
+		g.drawString("to side use the left and right arrows.", 300, 270);
+		g.drawString("press space to go back to main menu", 290, 400);
 	}
 
 	void drawGameover(Graphics g) {
@@ -115,7 +119,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 		titleFont = new Font("Arial", Font.PLAIN, 30);
 		g.setFont(titleFont);
 		g.setColor(Color.WHITE);
-		g.drawString("press ENTER to play again", 300, 350);
+		g.drawString("press ENTER to play again", 280, 350);
 	}
 
 	public void paintComponent(Graphics g) {
@@ -168,6 +172,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 				currentState = MAP;
 				wonka = new WillyWonka(250, 700, 50, 70);
 				manager = new ObjectManager(wonka);
+				
 				startGame();
 			} else if (currentState == MAP) {
 				currentState = GAMEOVER;
@@ -176,7 +181,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 			} else {
 				currentState++;
 			}
-			System.out.println(currentState);
+			//System.out.println(currentState);
 
 		} else if (e.getKeyCode() == KeyEvent.VK_UP)
 
