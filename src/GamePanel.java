@@ -26,7 +26,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 	Timer fps;
 	int frameCount = 0;
 	int startFrameCount = 0;
-	
+
 	ObjectManager manager;
 	public static BufferedImage bgimage;
 	public static BufferedImage menuimage;
@@ -166,22 +166,24 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 				currentState = MENU;
 			}
 		}
-		
+
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (currentState == MENU) {
 				currentState = MAP;
 				wonka = new WillyWonka(250, 700, 50, 70);
 				manager = new ObjectManager(wonka);
-				
+
 				startGame();
 			} else if (currentState == MAP) {
 				currentState = GAMEOVER;
+			} else if (currentState == INTRO) {
+				currentState = MENU;
 			} else if (currentState == GAMEOVER) {
 				currentState = MENU;
 			} else {
 				currentState++;
 			}
-			//System.out.println(currentState);
+			// System.out.println(currentState);
 
 		} else if (e.getKeyCode() == KeyEvent.VK_UP)
 

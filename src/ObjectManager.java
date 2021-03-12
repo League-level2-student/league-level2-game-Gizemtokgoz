@@ -36,7 +36,7 @@ public class ObjectManager implements ActionListener {
 
 	void addCandy(int numCandy) {
 		for (int i = 0; i < numCandy; i++) {
-			candy.add(new Candy(rand.nextInt(WonkaWorld.WIDTH), rand.nextInt(WonkaWorld.HEIGHT), 50, 50));
+			candy.add(new Candy(rand.nextInt(WonkaWorld.WIDTH), rand.nextInt(WonkaWorld.HEIGHT-wonka.height), 50, 50));
 		}
 	}
 
